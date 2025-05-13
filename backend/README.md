@@ -9,6 +9,7 @@
 * dotenv
 * bcrypt
 * cloudinary
+* multer
 
 ## Tables
 * users  
@@ -42,4 +43,96 @@
     digunakan untuk menggambarkan tipe makanan dari resep yang diupload user, bagian dari table recipes
 
 ## Endpoint 
-* 
+### /user/register  
+    Membuat akun baru bagi user  
+    - Method : POST
+    - req : query (email, password, name)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * name
+            * email
+            * password (terenkripsi dengan menggunakan bcrypt)
+            * created_at
+### /user/login  
+    User login, (mengambil data user dengan email, kemudian mencocokkan password)  
+    - Method : POST 
+    - req : query (email, password)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * name
+            * email
+            * password (terenkripsi dengan menggunakan bcrypt)
+            * created_at
+### /user/:id
+    Mengambil data user berdasarkan id yang diberikan  
+    - Method : GET
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * name
+            * email
+            * password (terenkripsi dengan menggunakan bcrypt)
+            * created_at
+### /recipe/create
+    Mengupload recipe baru  
+    - Method : POST
+    - req : query (name, caption, image(file), author_id, food_type, procedure, is_public, ingredients)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_id
+            * name
+            * caption
+            * image_url
+            * food_type
+            * ingredients
+            * procedure
+            * is_public
+            * created_at
+### /recipe/public
+    Mendapatkan semua data recipe yang bersifat public (is_public === true)
+    - Method : GET
+    - req : none
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_name
+            * name
+            * caption
+            * image_url
+            * food_type
+            * created_at
+            * total_reviews
+            * average_rating
+### /recipe/:id
+    - Method : GET
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_name
+            * name
+            * caption
+            * image_url
+            * food_type
+            * ingredients
+            * procedure
+            * is_public
+            * created_at
+            * total_reviews
+            * average_rating

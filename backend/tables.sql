@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS recipes (
     caption TEXT,
     image_url VARCHAR(255) NOT NULL,
     food_type type NOT NULL,
+    ingredients TEXT NOT NULL,
     procedure TEXT NOT NULL,
+    is_public BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

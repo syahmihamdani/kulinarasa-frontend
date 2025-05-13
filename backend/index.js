@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.use('/user', require('./src/routes/user.route'));
 app.use('/recipe', require('./src/routes/recipe.route'));
-app.use('/review', require('./src/routes/review.route'));
+// app.use('/review', require('./src/routes/review.route'));
 
 
 app.listen(port, () => {

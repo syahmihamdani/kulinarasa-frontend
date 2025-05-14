@@ -3,11 +3,13 @@ const recipeRepository = require('../repositories/recipe.repository');
 
 exports.createRecipe = async (req, res) => {
     try{
-        const recipe = await recipeRepository.createRecipe(req.body);
+        console.log(req.body);
+        console.log(req.file);
+        const recipe = await recipeRepository.createRecipe(req.body, req.file);
         if (!recipe) {
             return baseResponse(res, false, 400, "Failed to upload recipe", null);
         }
-        return baseResponse(res, true, 201, "Recipe uploaded", game);
+        return baseResponse(res, true, 201, "Recipe uploaded", recipe);
     } catch (error) {
         return baseResponse(res, false, 500, "An error occurred while uploading recipe", error);
     }

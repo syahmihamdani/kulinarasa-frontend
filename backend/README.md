@@ -10,6 +10,7 @@
 * bcrypt
 * cloudinary
 * multer
+* cors
 
 ## Tables
 * users  

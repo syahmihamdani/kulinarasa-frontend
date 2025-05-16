@@ -3,6 +3,7 @@ const baseResponse = require("../utils/baseResponse.util");
 
 exports.createReview = async (review) => {
     try {
+        console.log(review);
         const res = await db.query(
             "INSERT INTO reviews (recipe_id, user_id, rating, review_text) VALUES ($1, $2, $3, $4) RETURNING *",
             [review.recipe_id, review.user_id, review.rating, review.review_text]

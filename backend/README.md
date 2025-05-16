@@ -86,7 +86,7 @@
 ### /recipe/create
     Mengupload recipe baru  
     - Method : POST
-    - req : query (name, caption, image(file), author_id, food_type, procedure, is_public, ingredients)
+    - req : body (name, caption, image(file), author_id, food_type, procedure, is_public, ingredients)
     - return : 
         * success (true/false)
         * message
@@ -137,3 +137,42 @@
             * created_at
             * total_reviews
             * average_rating
+### /review/create
+    - Method : POST
+    - req : body (recipe_id, user_id, rating, review_text)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * user_id
+            * recipe_id
+            * rating
+            * review_text
+            * created_at
+### /review/byrecipe/:id
+    - Method : GET
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * user_id
+            * recipe_id
+            * rating
+            * review_text
+            * created_at
+### /review/byuser/:id  
+    - Method : GET
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * user_id
+            * recipe_id
+            * rating
+            * review_text
+            * created_at

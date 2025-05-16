@@ -5,8 +5,8 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const corsOptions = {
-    origin: ["localhost", "vercel.com"],
+const   corsOptions = {
+    origin: ["localhost", "vercel.com", "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE"],
 };
 

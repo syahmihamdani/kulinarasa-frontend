@@ -5,7 +5,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        kulinarasa: {
+          darkblue: '#0b141b',
+          brown: '#482c28',
+          orange: '#9a3a0a',
+          yellow: '#b77d11',
+          gray: '#8b8b83'
+        },
+      },
+    },
   },
   plugins: [],
 }

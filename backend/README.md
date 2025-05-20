@@ -119,6 +119,61 @@
             * total_reviews
             * average_rating
 ### /recipe/:id
+    - Mencari recipe berdasarkan ID
+    - Method : GET
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_name
+            * name
+            * caption
+            * image_url
+            * food_type
+            * ingredients
+            * procedure
+            * is_public
+            * created_at
+            * total_reviews
+            * average_rating
+### /recipe/delete/:id
+    - menghapus recipe berdasarkan id
+    - Method : DELETE
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_id
+            * name
+            * caption
+            * image_url
+            * food_type
+            * ingredients
+            * procedure
+            * is_public
+            * created_at
+### /recipe/search/:word
+    - Method : GET
+    - req : param (word)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * author_name
+            * name
+            * caption
+            * image_url
+            * food_type
+            * created_at
+            * total_reviews
+            * average_rating
+### /recipe/byuser/:id
+- Mencari recipe berdasarkan ID user
     - Method : GET
     - req : param (id)
     - return : 
@@ -138,6 +193,7 @@
             * total_reviews
             * average_rating
 ### /review/create
+    - Membuat review baru
     - Method : POST
     - req : body (recipe_id, user_id, rating, review_text)
     - return : 
@@ -151,6 +207,7 @@
             * review_text
             * created_at
 ### /review/byrecipe/:id
+    - Mengambil recipe berdasarkan id
     - Method : GET
     - req : param (id)
     - return : 
@@ -164,6 +221,7 @@
             * review_text
             * created_at
 ### /review/byuser/:id  
+    - mendapatkan review berdasarkan user id
     - Method : GET
     - req : param (id)
     - return : 
@@ -176,3 +234,30 @@
             * rating
             * review_text
             * created_at
+### /review/update
+    - Method : PUT
+    - req : body (id, rating, review_text)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * user_id
+            * recipe_id
+            * rating
+            * review_text
+            * created_at
+### /review/delete/:id
+    - Method : DELETE
+    - req : param (id)
+    - return : 
+        * success (true/false)
+        * message
+        * payload 
+            * id
+            * user_id
+            * recipe_id
+            * rating
+            * review_text
+            * created_at
+

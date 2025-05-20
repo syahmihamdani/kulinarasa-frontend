@@ -31,7 +31,7 @@ exports.getPublicRecipes = async () => {
         const res = await db.query("SELECT recipes.id, recipes.name, caption, image_url, users.name AS author_name, food_type,  recipes.created_at, COUNT(reviews.id) AS total_reviews, AVG(reviews.rating) AS average_rating FROM recipes LEFT JOIN reviews ON recipes.id = reviews.recipe_id JOIN users ON recipes.author_id = users.id WHERE is_public = true GROUP BY recipes.id, users.name ORDER BY average_rating DESC");
         return res.rows;
     } catch (error) {
-        console.log("Error creating recipe", error);
+        console.log("Error get recipe", error);
     }
 }
 
@@ -40,6 +40,34 @@ exports.getRecipeById = async (id) => {
         const res = await db.query("SELECT recipes.id, recipes.name, caption, image_url, users.name AS author_name, food_type, ingredients, procedure, is_public, recipes.created_at, COUNT(reviews.id) AS total_reviews, AVG(reviews.rating) AS average_rating FROM recipes LEFT JOIN reviews ON recipes.id = reviews.recipe_id JOIN users ON recipes.author_id = users.id WHERE recipes.id = $1 GROUP BY recipes.id, users.name", [id]);
         return res.rows[0];
     } catch (error) {
-        console.log("Error creating recipe", error);
+        console.log("Error Get recipe", error);
+    }
+}
+
+
+exports.deleteRecipe = async (id) => {
+    try{
+        const res = await db.query("DELETE FROM recipes WHERE id = $1 RETURNING *", [id]);
+        return res.rows[0];
+    } catch (error) {
+        console.log("Error Deleting recipe", error);
+    }
+}
+
+exports.searchRecipe = async (word) => {
+    try{
+        const res = await db.query("SELECT recipes.id, recipes.name, caption, image_url, users.name AS author_name, food_type,  recipes.created_at, COUNT(reviews.id) AS total_reviews, AVG(reviews.rating) AS average_rating FROM recipes LEFT JOIN reviews ON recipes.id = reviews.recipe_id JOIN users ON recipes.author_id = users.id WHERE (is_public = true AND recipes.name ILIKE $1) GROUP BY recipes.id, users.name ORDER BY average_rating DESC", [`%${word}%`]);
+        return res.rows;
+    } catch (error) {
+        console.log("Error searching recipe", error);
+    }
+}
+
+exports.getRecipeByUserId = async (id) => {
+    try{
+        const res = await db.query("SELECT recipes.id, recipes.name, caption, image_url, users.name AS author_name, food_type, ingredients, procedure, is_public, recipes.created_at, COUNT(reviews.id) AS total_reviews, AVG(reviews.rating) AS average_rating FROM recipes LEFT JOIN reviews ON recipes.id = reviews.recipe_id JOIN users ON recipes.author_id = users.id WHERE recipes.author_id = $1 GROUP BY recipes.id, users.name", [id]);
+        return res.rows; 
+    } catch (error) {
+        console.log("Error getting recipe", error);
     }
 }

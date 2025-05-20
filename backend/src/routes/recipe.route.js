@@ -10,5 +10,8 @@ const upload = multer({ storage: storage });
 router.post('/create', upload.single('image'), recipeController.createRecipe);
 router.get('/public', recipeController.getPublicRecipes);
 router.get('/:id', recipeController.getRecipeById);
+router.delete('/delete/:id', recipeController.deleteRecipe);
+router.get('/search/:word', recipeController.searchRecipe);
+router.get('/byuser/:id', recipeController.getRecipeByUserId);
 
 module.exports = router;

@@ -37,3 +37,27 @@ exports.getByUserId = async (req, res) => {
         return baseResponse(res, false, 500, "An error occurred while getting review by user id", error);
     }
 }
+
+exports.updateReview = async (req, res) => {
+    try{
+        const review = await reviewRepository.updateReview(req.body);
+        if (!review) {
+            return baseResponse(res, false, 400, "Failed to update review", null);
+        }
+        return baseResponse(res, true, 200, "Review updated", review);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while updating review", error);
+    }
+}
+
+exports.deleteReview = async (req, res) => {
+    try{
+        const review = await reviewRepository.deleteReview(req.params.id);
+        if (!review) {
+            return baseResponse(res, false, 400, "Failed to delete review", null);
+        }
+        return baseResponse(res, true, 200, "Review deleted", review);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while deleting review", error);
+    }
+}

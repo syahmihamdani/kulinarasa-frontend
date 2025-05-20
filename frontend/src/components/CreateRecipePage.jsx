@@ -144,7 +144,7 @@ export default function CreateRecipePage() {
       submissionData.append('image', imageFile);
 
       // Send to backend
-      const response = await axios.post('http://localhost:3000/recipe/create', submissionData, {
+      const response = await axios.post('https://kulinarasa-backend.vercel.app/recipe/create', submissionData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

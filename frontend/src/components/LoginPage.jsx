@@ -29,7 +29,7 @@ export default function LoginPage() {
         password: formData.password
       }).toString()
       
-      const response = await fetch(`http://localhost:3000/user/login?${queryParams}`, {
+      const response = await fetch(`https://kulinarasa-backend.vercel.app/user/login?${queryParams}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

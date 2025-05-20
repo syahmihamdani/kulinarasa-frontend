@@ -17,7 +17,7 @@ const ProfilePage = () => {
       try {
         setLoading(true);
         // Fetch user data
-        const userResponse = await fetch(`http://localhost:3000/user/${id}`);
+        const userResponse = await fetch(`https://kulinarasa-backend.vercel.app/user/${id}`);
         if (!userResponse.ok) {
           throw new Error('Failed to fetch user data');
         }
@@ -25,7 +25,7 @@ const ProfilePage = () => {
         setUser(userData.success && userData.payload ? userData.payload : userData);
 
         // Fetch user reviews
-        const reviewsResponse = await fetch(`http://localhost:3000/review/byuser/${id}`);
+        const reviewsResponse = await fetch(`https://kulinarasa-backend.vercel.app/review/byuser/${id}`);
         if (!reviewsResponse.ok) {
           throw new Error('Failed to fetch user reviews');
         }
@@ -43,7 +43,7 @@ const ProfilePage = () => {
         }
 
         // Fetch user recipes
-        const recipesResponse = await fetch(`http://localhost:3000/recipe/byuser/${id}`);
+        const recipesResponse = await fetch(`https://kulinarasa-backend.vercel.app/recipe/byuser/${id}`);
         if (!recipesResponse.ok) {
           throw new Error('Failed to fetch user recipes');
         }

@@ -1,1 +1,0 @@
-# kulinarasa-FinPro

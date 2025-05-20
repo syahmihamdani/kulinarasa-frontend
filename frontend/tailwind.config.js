@@ -15,6 +15,9 @@ export default {
           gray: '#8b8b83'
         },
       },
+      fontFamily:{
+        kulinarasa: ["Anzicar Serif"]
+      },
     },
   },
   plugins: [],

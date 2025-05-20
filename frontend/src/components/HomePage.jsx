@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
+import { Home, Search, PlusCircle, Bookmark, LogOut } from "lucide-react";
+import Navbar from './elements/Navbar'
 
 export default function HomePage() {
   const [recipes, setRecipes] = useState([])
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     fetch('http://localhost:3000/recipe/public')
@@ -19,17 +23,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow p-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-orange-600">Kulinarasa</h1>
-        <div className="space-x-4">
-          <a href="/" className="text-gray-700 hover:text-orange-500">Home</a>
-          <a href="/find" className="text-gray-700 hover:text-orange-500">Find</a>
-          <a href="/add" className="text-gray-700 hover:text-orange-500">Add</a>
-          <a href="/saved" className="text-gray-700 hover:text-orange-500">Saved</a>
-          <a href="/login" className="text-gray-700 hover:text-orange-500">Logout</a>
-        </div>
-      </nav>
-
+      <Navbar />
       <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {recipes.length === 0 ? (
           <p className="text-center col-span-full text-gray-500">No public recipes available.</p>

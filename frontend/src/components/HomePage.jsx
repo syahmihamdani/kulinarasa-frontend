@@ -10,7 +10,7 @@ export default function HomePage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch('http://localhost:3000/recipe/public')
+    fetch('https://kulinarasa-backend.vercel.app/recipe/public')
       .then(res => res.json())
       .then(data => {
         console.log("Fetched data:", data);

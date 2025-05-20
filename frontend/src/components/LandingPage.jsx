@@ -95,7 +95,7 @@ export default function LandingPage() {
 
     const handleRegisterButton = (e) => {
         e.preventDefault();
-        navigate('/home');
+        navigate('/register');
     };
 
     const handleLoginButton = (e) => {

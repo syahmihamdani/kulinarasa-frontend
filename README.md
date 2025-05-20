@@ -33,7 +33,7 @@
 ![picture 3](https://i.imgur.com/5TkEd31.png)  
 
 **Flowchart**
-(belum)
+![picture](https://i.imgur.com/QHJQGoI.png)  
 
 # :computer: Installation Guide
 
@@ -83,8 +83,18 @@ git clone https://github.com/HendhyW/kulinarasa-FinPro.git
   ```
    node index.js
   ```
-  
-# 💻 Progress Report:
-(menyusul)
+
+# 🍔 APP Overview
+![picture 1](https://i.imgur.com/IMbS5dl.png)
+
+![picture 2](https://i.imgur.com/Pvd1G7k.png)
+
+![picture 3](https://i.imgur.com/W0yWa1H.jpeg)  
+
+![picture 4](https://i.imgur.com/FyNvHcP.png)  
+
+![picture 5](https://i.imgur.com/56lsnfL.png)  
+
+
 
 

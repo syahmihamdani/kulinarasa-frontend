@@ -35,3 +35,27 @@ exports.getByUserId = async (id) => {
         console.log("Error getting review by user id", error);
     }
 }
+
+exports.updateReview = async (review) => {
+    try {
+        const res = await db.query(
+            "UPDATE reviews SET rating = $1, review_text = $2 WHERE id = $3 RETURNING *",
+            [review.rating, review.review_text, review.id]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log("Error updating review", error);
+    }
+}
+
+exports.deleteReview = async (id) => {
+    try {
+        console.log(id);
+        const res = await db.query(
+            "DELETE FROM reviews WHERE id = $1 RETURNING *", [id]
+        );
+        return res.rows[0];
+    } catch (error) {
+        console.log("Error deleting review", error);
+    }
+}

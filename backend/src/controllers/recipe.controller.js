@@ -38,3 +38,39 @@ exports.getRecipeById = async (req, res) => {
         return baseResponse(res, false, 500, "An error occurred while retrieving recipe", error);
     }
 }
+
+exports.deleteRecipe = async (req, res) => {
+    try {
+        const recipe = await recipeRepository.deleteRecipe(req.params.id);
+        if (!recipe) {
+            return baseResponse(res, false, 400, "Failed to delete recipe", null);
+        }
+        return baseResponse(res, true, 200, "Recipe deleted", recipe);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while deleting recipe", error);
+    }
+}
+
+exports.searchRecipe = async (req, res) => {
+    try {
+        const recipes = await recipeRepository.searchRecipe(req.params.word);
+        if (!recipes) {
+            return baseResponse(res, false, 400, "Recipe not found", null);
+        }
+        return baseResponse(res, true, 200, "Recipes retrieved", recipes);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while searching recipe", error);
+    }
+}
+
+exports.getRecipeByUserId = async (req, res) => {
+    try {
+        const recipes = await recipeRepository.getRecipeByUserId(req.params.id);
+        if (!recipes) {
+            return baseResponse(res, false, 400, "Failed to get recipes by user id", null);
+        }
+        return baseResponse(res, true, 200, "Recipes retrieved", recipes);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while retrieving recipes by user id", error);
+    }
+}

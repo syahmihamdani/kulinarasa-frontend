@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, StarHalf, User, Book, MessageSquare } from 'lucide-react';
+import { Star, StarHalf, User, Book, MessageSquare, Clock } from 'lucide-react';
 import Navbar from './elements/Navbar';
 
 const ProfilePage = () => {
@@ -42,9 +42,23 @@ const ProfilePage = () => {
           setReviews([]);
         }
 
-        // Note: There's no API endpoint yet for user recipes
-        // This is where you would fetch user recipes in the future
-        setRecipes([]);
+        // Fetch user recipes
+        const recipesResponse = await fetch(`http://localhost:3000/recipe/byuser/${id}`);
+        if (!recipesResponse.ok) {
+          throw new Error('Failed to fetch user recipes');
+        }
+        const recipesData = await recipesResponse.json();
+        
+        // Handle different response formats for recipes
+        if (recipesData.success && Array.isArray(recipesData.payload)) {
+          setRecipes(recipesData.payload);
+        } else if (Array.isArray(recipesData)) {
+          setRecipes(recipesData);
+        } else if (recipesData && typeof recipesData === 'object') {
+          setRecipes(recipesData.recipes || Object.values(recipesData) || []);
+        } else {
+          setRecipes([]);
+        }
       } catch (err) {
         setError(err.message);
         setReviews([]);
@@ -79,6 +93,18 @@ const ProfilePage = () => {
     return stars
   }
 
+  // Format date helper
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  // Truncate text helper
+  const truncateText = (text, maxLength = 100) => {
+    if (!text || text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -98,7 +124,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-        <Navbar />
+      <Navbar />
       {/* User Profile Section - Centered with profile pic on top */}
       <div className="bg-white shadow rounded-lg mb-6 mt-6 p-6">
         <div className="flex flex-col items-center text-center">
@@ -117,7 +143,7 @@ const ProfilePage = () => {
       <div className="flex justify-center mb-6 text-black">
         <button
           onClick={() => setActiveTab('reviews')}
-          className={`px-6 py-3 text-lg font-medium${
+          className={`px-6 py-3 text-lg font-medium ${
             activeTab === 'reviews'
               ? 'text-black bg-transparent underline underline-offset-8'
               : 'text-black bg-transparent'
@@ -130,7 +156,7 @@ const ProfilePage = () => {
         </button>
         <button
           onClick={() => setActiveTab('recipes')}
-          className={`px-6 py-3 text-lg font-medium${
+          className={`px-6 py-3 text-lg font-medium ${
             activeTab === 'recipes'
               ? 'text-black bg-transparent underline underline-offset-8'
               : 'text-black bg-transparent'
@@ -167,7 +193,7 @@ const ProfilePage = () => {
                       </Link>
                     </div>
                     <p className="text-xs text-gray-400">
-                      {review.created_at && new Date(review.created_at).toLocaleDateString()}
+                      {formatDate(review.created_at)}
                     </p>
                   </div>
                   <p className="text-gray-800 text-left">{review.review_text}</p>
@@ -179,6 +205,69 @@ const ProfilePage = () => {
       ) : (
         <div className="bg-white shadow rounded-lg p-6 max-w-4xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-kulinarasa-darkblue font-kulinarasa text-left">User Recipes</h2>
+          
+          {!Array.isArray(recipes) || recipes.length === 0 ? (
+            <p className="text-gray-500 py-4 text-center">No recipes yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {recipes.map((recipe, index) => (
+                <Link 
+                  to={`/recipe/${recipe.id}`} 
+                  key={index}
+                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                >
+                  <div className="relative h-48 bg-gray-200">
+                    {recipe.image_url ? (
+                      <img 
+                        src={recipe.image_url} 
+                        alt={recipe.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full bg-kulinarasa-lightblue">
+                        <Book size={48} className="text-kulinarasa-darkblue" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                      <h3 className="text-white font-semibold text-lg">{recipe.name}</h3>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center">
+                        <span className="bg-kulinarasa-lightblue text-kulinarasa-darkblue px-2 py-1 rounded text-xs">
+                          {recipe.food_type || 'Other'}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-gray-500 text-xs">
+                        <Clock size={14} className="mr-1" />
+                        {formatDate(recipe.created_at)}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-3">
+                      {truncateText(recipe.caption, 80)}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {recipe.average_rating ? (
+                          <div className="flex items-center">
+                            <div className="flex">
+                              {renderStars(recipe.average_rating)}
+                            </div>
+                            <span className="ml-1 text-sm text-gray-600">
+                              ({recipe.total_reviews || 0})
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-500">No ratings yet</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -5,6 +5,7 @@ import HomePage from './components/HomePage';
 import RegisterPage from './components/RegisterPage';
 import LandingPage from './components/LandingPage';
 import CreateRecipePage from './components/CreateRecipePage'
+import RecipePage from './components/RecipePage';
 
 function App() {
   return (
@@ -12,11 +13,12 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage/>}/>
-        <Route path="/" element={<LandingPage/>}/>
-        <Route path="/add" element={<CreateRecipePage/>}/>
-
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/add" element={<CreateRecipePage />} />
+        <Route path="/recipe/:id" element={<RecipePage />}/>
       </Routes>
+
     </BrowserRouter>
   )
 }

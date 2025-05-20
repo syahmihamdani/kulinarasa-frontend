@@ -1,10 +1,37 @@
 import { useEffect, useState } from 'react'
-import { Home, Search, PlusCircle, Bookmark, LogOut } from "lucide-react";
-
+import { Home, Search, PlusCircle, Bookmark, LogOut, User } from "lucide-react";
+import { useNavigate } from 'react-router-dom'
 
 function Navbar() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [userId, setUserId] = useState(null)
+  const [userName, setUserName] = useState(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Get user ID from local storage when component mounts
+    try {
+      const userData = localStorage.getItem('user')
+      if (userData) {
+        const parsedUser = JSON.parse(userData)
+        setUserId(parsedUser.id || parsedUser._id) // Handle different possible ID formats
+        setUserName(parsedUser.name)
+      }
+    } catch (error) {
+      console.error("Error retrieving user data from local storage:", error)
+    }
+  }, [])
+
+  const handleProfileClick = (e) => {
+    e.preventDefault()
+    if (userId) {
+      navigate(`/profile/${userId}`)
+    } else {
+      // Navigate to a default profile page if no user ID is found
+      navigate('/profile')
+    }
+  }
 
   return (
     <nav className="bg-white shadow p-4 flex justify-between items-center">
@@ -49,6 +76,13 @@ function Navbar() {
         <a href="/saved" className="text-gray-700 hover:text-white hover:bg-kulinarasa-orange rounded-2xl p-2">
           <Bookmark className="w-5 h-5" />
         </a>
+        <button 
+          onClick={handleProfileClick}
+          className="flex items-center space-x-2 text-gray-700 hover:text-white bg-transparent hover:bg-kulinarasa-orange rounded-2xl px-3 py-2"
+        >
+          <User className="w-5 h-5" />
+          {userName && <span className="text-sm font-medium">{userName}</span>}
+        </button>   
         <a href="/" className="text-gray-700 hover:text-white hover:bg-kulinarasa-orange rounded-2xl p-2">
           <LogOut className="w-5 h-5" />
         </a>

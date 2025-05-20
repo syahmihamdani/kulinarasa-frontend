@@ -3,7 +3,6 @@ const reviewRepository = require('../repositories/review.repository');
 
 exports.createReview = async (req, res) => {
     try{
-        console.log(req.body);
         const review = await reviewRepository.createReview(req.body);
         if (!review) {
             return baseResponse(res, false, 400, "Failed to upload review", null);

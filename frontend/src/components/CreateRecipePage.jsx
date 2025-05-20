@@ -163,10 +163,10 @@ export default function CreateRecipePage() {
   };
 
   return (
-    <div className="bg-orange-100 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <Navbar />
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-5">
-        <h1 className="text-3xl font-bold mb-6 text-center font-kulinarasa text-kulinarasa-orange">Create New Recipe</h1>
+        <h1 className="text-3xl mb-6 text-center font-kulinarasa text-kulinarasa-orange">Create New Recipe</h1>
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -242,7 +242,7 @@ export default function CreateRecipePage() {
               {/* Image Upload */}
               <div>
                 <label htmlFor="image" className="block text-gray-700 font-medium mb-2">
-                  Recipe Image
+                  Recipe Image *
                 </label>
                 <input
                   type="file"

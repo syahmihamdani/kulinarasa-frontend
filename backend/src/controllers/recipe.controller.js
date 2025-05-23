@@ -74,3 +74,27 @@ exports.getRecipeByUserId = async (req, res) => {
         return baseResponse(res, false, 500, "An error occurred while retrieving recipes by user id", error);
     }
 }
+
+exports.updateRecipeText = async (req, res) => {
+    try {
+        const recipe = await recipeRepository.updateRecipeText(req.body);
+        if (!recipe) {
+            return baseResponse(res, false, 400, "Failed to update recipe", null);
+        }
+        return baseResponse(res, true, 200, "Recipe updated", recipe);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while updating recipe", error);
+    }
+}
+
+exports.updateRecipeImage = async (req, res) => {
+    try {
+        const recipe = await recipeRepository.updateRecipeImage(req.body, req.file);
+        if (!recipe) {
+            return baseResponse(res, false, 400, "Failed to update recipe", null);
+        }
+        return baseResponse(res, true, 200, "Recipe updated", recipe);
+    } catch (error) {
+        return baseResponse(res, false, 500, "An error occurred while updating recipe", error);
+    }
+}

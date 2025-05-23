@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Star, StarHalf, User, Book, MessageSquare, Clock } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Star, StarHalf, User, Book, MessageSquare, Clock, Trash2, X, Edit } from 'lucide-react';
 import Navbar from './elements/Navbar';
 
 const ProfilePage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('reviews');
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, recipeId: null, recipeName: '' });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,7 +33,7 @@ const ProfilePage = () => {
           throw new Error('Failed to fetch user reviews');
         }
         const reviewsData = await reviewsResponse.json();
-        
+
         // Handle different response formats
         if (reviewsData.success && Array.isArray(reviewsData.payload)) {
           setReviews(reviewsData.payload);
@@ -48,7 +51,7 @@ const ProfilePage = () => {
           throw new Error('Failed to fetch user recipes');
         }
         const recipesData = await recipesResponse.json();
-        
+
         // Handle different response formats for recipes
         if (recipesData.success && Array.isArray(recipesData.payload)) {
           setRecipes(recipesData.payload);
@@ -71,25 +74,66 @@ const ProfilePage = () => {
     fetchUserData();
   }, [id]);
 
+  // Delete recipe function
+  const handleDeleteRecipe = async (recipeId) => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`https://kulinarasa-backend.vercel.app/recipe/delete/${recipeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete recipe');
+      }
+
+      // Remove the deleted recipe from the local state
+      setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+      setDeleteModal({ isOpen: false, recipeId: null, recipeName: '' });
+    } catch (err) {
+      setError(err.message);
+      alert('Failed to delete recipe. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Handle edit recipe - navigate to edit page
+  const handleEditRecipe = (recipeId) => {
+    navigate(`/recipe/edit/${recipeId}`);
+  };
+
+  // Open delete confirmation modal
+  const openDeleteModal = (recipeId, recipeName) => {
+    setDeleteModal({ isOpen: true, recipeId, recipeName });
+  };
+
+  // Close delete confirmation modal
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, recipeId: null, recipeName: '' });
+  };
+
   // Render star rating similar to RecipePage
   const renderStars = (rating) => {
     const stars = []
     const fullStars = Math.floor(rating)
     const hasHalfStar = rating % 1 >= 0.5
-    
+
     for (let i = 0; i < fullStars; i++) {
       stars.push(<Star key={`star-${i}`} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)
     }
-    
+
     if (hasHalfStar) {
       stars.push(<StarHalf key="half-star" className="w-4 h-4 fill-yellow-400 text-yellow-400" />)
     }
-    
+
     const emptyStars = 5 - stars.length
     for (let i = 0; i < emptyStars; i++) {
       stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />)
     }
-    
+
     return stars
   }
 
@@ -107,17 +151,21 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-xl font-semibold text-kulinarasa-darkblue">Loading profile...</div>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-6xl mx-auto p-6">
+          <div className="flex justify-center items-center py-12">
+            <p className="text-xl text-gray-600">Loading profile...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 my-4">
-        <p className="text-red-600">{error}</p>
-        <p className="mt-2">Please try again later or contact support.</p>
+      <div className='min-h-screen'>
+        <p className="mt-2 text-gray-50">Please try again later or contact support.</p>
       </div>
     );
   }
@@ -143,11 +191,10 @@ const ProfilePage = () => {
       <div className="flex justify-center mb-6 text-black">
         <button
           onClick={() => setActiveTab('reviews')}
-          className={`px-6 py-3 text-lg font-medium ${
-            activeTab === 'reviews'
+          className={`px-6 py-3 text-lg font-medium ${activeTab === 'reviews'
               ? 'text-black bg-transparent underline underline-offset-8'
               : 'text-black bg-transparent'
-          }`}
+            }`}
         >
           <div className="flex items-center">
             <MessageSquare size={18} className="mr-2" />
@@ -156,11 +203,10 @@ const ProfilePage = () => {
         </button>
         <button
           onClick={() => setActiveTab('recipes')}
-          className={`px-6 py-3 text-lg font-medium ${
-            activeTab === 'recipes'
+          className={`px-6 py-3 text-lg font-medium ${activeTab === 'recipes'
               ? 'text-black bg-transparent underline underline-offset-8'
               : 'text-black bg-transparent'
-          }`}
+            }`}
         >
           <div className="flex items-center">
             <Book size={18} className="mr-2" />
@@ -179,8 +225,8 @@ const ProfilePage = () => {
           ) : (
             <div className="space-y-4">
               {reviews.map((review, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="bg-gray-50 p-4 rounded-lg shadow mb-4"
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -205,69 +251,133 @@ const ProfilePage = () => {
       ) : (
         <div className="bg-white shadow rounded-lg p-6 max-w-4xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-kulinarasa-darkblue font-kulinarasa text-left">User Recipes</h2>
-          
+
           {!Array.isArray(recipes) || recipes.length === 0 ? (
             <p className="text-gray-500 py-4 text-center">No recipes yet.</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {recipes.map((recipe, index) => (
-                <Link 
-                  to={`/recipe/${recipe.id}`} 
+                <div
                   key={index}
-                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 relative"
                 >
-                  <div className="relative h-48 bg-gray-200">
-                    {recipe.image_url ? (
-                      <img 
-                        src={recipe.image_url} 
-                        alt={recipe.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full bg-kulinarasa-lightblue">
-                        <Book size={48} className="text-kulinarasa-darkblue" />
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-white font-semibold text-lg">{recipe.name}</h3>
-                    </div>
+                  {/* Action buttons container */}
+                  <div className="absolute top-2 right-2 z-10 flex space-x-2">
+                    {/* Edit button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleEditRecipe(recipe.id);
+                      }}
+                      className="bg-black hover:bg-white hover:text-black text-white p-2 rounded-full shadow-lg transition-colors duration-200"
+                      title="Edit Recipe"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    
+                    {/* Delete button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        openDeleteModal(recipe.id, recipe.name);
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-colors duration-200"
+                      title="Delete Recipe"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center">
-                        <span className="bg-kulinarasa-lightblue text-kulinarasa-darkblue px-2 py-1 rounded text-xs">
-                          {recipe.food_type || 'Other'}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-500 text-xs">
-                        <Clock size={14} className="mr-1" />
-                        {formatDate(recipe.created_at)}
+
+                  <Link to={`/recipe/${recipe.id}`}>
+                    <div className="relative h-48 bg-gray-200">
+                      {recipe.image_url ? (
+                        <img
+                          src={recipe.image_url}
+                          alt={recipe.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full bg-kulinarasa-lightblue">
+                          <Book size={48} className="text-kulinarasa-darkblue" />
+                        </div>
+                      )}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <h3 className="text-white font-semibold text-lg">{recipe.name}</h3>
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm mb-3">
-                      {truncateText(recipe.caption, 80)}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        {recipe.average_rating ? (
-                          <div className="flex items-center">
-                            <div className="flex">
-                              {renderStars(recipe.average_rating)}
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <span className="bg-kulinarasa-lightblue text-kulinarasa-darkblue px-2 py-1 rounded text-xs">
+                            {recipe.food_type || 'Other'}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-500 text-xs">
+                          <Clock size={14} className="mr-1" />
+                          {formatDate(recipe.created_at)}
+                        </div>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        {truncateText(recipe.caption, 80)}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          {recipe.average_rating ? (
+                            <div className="flex items-center">
+                              <div className="flex">
+                                {renderStars(recipe.average_rating)}
+                              </div>
+                              <span className="ml-1 text-sm text-gray-600">
+                                ({recipe.total_reviews || 0})
+                              </span>
                             </div>
-                            <span className="ml-1 text-sm text-gray-600">
-                              ({recipe.total_reviews || 0})
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-500">No ratings yet</span>
-                        )}
+                          ) : (
+                            <span className="text-xs text-gray-500">No ratings yet</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Delete Recipe</h3>
+              <button
+                onClick={closeDeleteModal}
+                className="text-gray-400 bg-white hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete "{deleteModal.recipeName}"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeDeleteModal}
+                disabled={isDeleting}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 bg-gray-200 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteRecipe(deleteModal.recipeId)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

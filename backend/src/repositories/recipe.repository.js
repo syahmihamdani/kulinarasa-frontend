@@ -71,3 +71,30 @@ exports.getRecipeByUserId = async (id) => {
         console.log("Error getting recipe", error);
     }
 }
+
+exports.updateRecipeText = async (recipe) => {
+    try{
+        const res = await db.query("UPDATE recipes SET name = $1, caption = $2, food_type = $3, ingredients = $4, procedure = $5, is_public = $6 WHERE id = $7 RETURNING *", [recipe.name, recipe.caption, recipe.food_type, recipe.ingredients, recipe.procedure, recipe.is_public, recipe.id]);
+        return res.rows[0];
+    } catch (error) {
+        console.log("Error updating recipe", error);
+    }
+}
+
+exports.updateRecipeImage = async (id, image) => {
+    try{
+        let imageB64 = null;
+        if(image){
+            imageB64 = `data:${image.mimetype};base64,${image.buffer.toString('base64')}`;
+        }
+        const url = await cloudinary.uploader.upload(imageB64, {
+            resource_type: "image",
+            public_id: "image",
+            notification_url: "http:/localhost:3000/recipe/create"
+        }); 
+        const res = await db.query("UPDATE recipes SET image_url = $1 WHERE id = $2 RETURNING *", [url.secure_url, id.id]);
+        return res.rows[0];
+    } catch (error) {
+        console.log("Error updating recipe", error);
+    }
+}

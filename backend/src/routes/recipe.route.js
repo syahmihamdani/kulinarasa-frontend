@@ -13,5 +13,7 @@ router.get('/:id', recipeController.getRecipeById);
 router.delete('/delete/:id', recipeController.deleteRecipe);
 router.get('/search/:word', recipeController.searchRecipe);
 router.get('/byuser/:id', recipeController.getRecipeByUserId);
+router.put("/update/text", recipeController.updateRecipeText);
+router.put("/update/image", upload.single('image'), recipeController.updateRecipeImage);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Clock, Users, ChevronLeft, Bookmark, Share2, Star, StarHalf, Pencil, Trash2, X } from 'lucide-react'
+import { Clock, Users, ChevronLeft, Bookmark, BookmarkCheck, Share2, Star, StarHalf, Pencil, Trash2, X } from 'lucide-react'
 import Navbar from './elements/Navbar'
 
 export default function RecipePage() {
@@ -26,6 +26,8 @@ export default function RecipePage() {
   })
   const [deletingReviewId, setDeletingReviewId] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [bookmarkLoading, setBookmarkLoading] = useState(false)
 
   // Get current user ID from localStorage
   useEffect(() => {
@@ -39,6 +41,100 @@ export default function RecipePage() {
       console.error('Error parsing user data from localStorage:', error)
     }
   }, [])
+
+  // Check if recipe is bookmarked
+  useEffect(() => {
+    if (currentUserId && recipe) {
+      checkIfBookmarked()
+    }
+  }, [currentUserId, recipe])
+
+  const checkIfBookmarked = () => {
+    try {
+      const savedRecipesData = localStorage.getItem(`savedRecipes_${currentUserId}`)
+      if (savedRecipesData) {
+        const savedRecipeIds = JSON.parse(savedRecipesData)
+        setIsBookmarked(savedRecipeIds.includes(recipe.id))
+      } else {
+        setIsBookmarked(false)
+      }
+    } catch (error) {
+      console.error('Error checking bookmark status:', error)
+      setIsBookmarked(false)
+    }
+  }
+
+  // Handle bookmark/unbookmark
+  const handleBookmarkToggle = () => {
+    if (!currentUserId) {
+      setReviewError('You must be logged in to save recipes.')
+      setTimeout(() => setReviewError(null), 3000)
+      return
+    }
+
+    setBookmarkLoading(true)
+    
+    try {
+      const savedRecipesData = localStorage.getItem(`savedRecipes_${currentUserId}`)
+      let savedRecipeIds = savedRecipesData ? JSON.parse(savedRecipesData) : []
+      
+      if (isBookmarked) {
+        // Remove from bookmarks
+        savedRecipeIds = savedRecipeIds.filter(recipeId => recipeId !== recipe.id)
+        setIsBookmarked(false)
+      } else {
+        // Add to bookmarks
+        if (!savedRecipeIds.includes(recipe.id)) {
+          savedRecipeIds.push(recipe.id)
+        }
+        setIsBookmarked(true)
+      }
+      
+      localStorage.setItem(`savedRecipes_${currentUserId}`, JSON.stringify(savedRecipeIds))
+      
+      // Show success message
+      setReviewSuccess(true)
+      setTimeout(() => setReviewSuccess(false), 2000)
+      
+    } catch (error) {
+      console.error('Error toggling bookmark:', error)
+      setReviewError('Failed to save recipe. Please try again.')
+      setTimeout(() => setReviewError(null), 3000)
+    } finally {
+      setBookmarkLoading(false)
+    }
+  }
+
+  // Handle share functionality
+  const handleShare = async () => {
+    const recipeUrl = window.location.href
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: recipe.name,
+          text: recipe.caption || `Check out this recipe: ${recipe.name}`,
+          url: recipeUrl,
+        })
+      } catch (error) {
+        console.error('Error sharing:', error)
+        fallbackShare(recipeUrl)
+      }
+    } else {
+      fallbackShare(recipeUrl)
+    }
+  }
+
+  const fallbackShare = (url) => {
+    // Copy to clipboard as fallback
+    navigator.clipboard.writeText(url).then(() => {
+      setReviewSuccess(true)
+      setTimeout(() => setReviewSuccess(false), 2000)
+    }).catch(() => {
+      setReviewError('Failed to copy recipe link')
+      setTimeout(() => setReviewError(null), 3000)
+    })
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -86,7 +182,7 @@ export default function RecipePage() {
   }
 
   const handleGoBack = () => {
-    navigate(-1) // Go back to previous page
+    navigate('/home') // Go back to previous page
   }
 
   // Handle review form input changes
@@ -377,10 +473,29 @@ export default function RecipePage() {
               }}
             />
             <div className="absolute top-4 right-4 flex gap-2">
-              <button className="bg-white p-2 rounded-full shadow">
-                <Bookmark size={20} className="text-kulinarasa-darkblue" />
+              <button 
+                onClick={handleBookmarkToggle}
+                disabled={bookmarkLoading}
+                className={`p-2 rounded-full shadow transition-colors ${
+                  isBookmarked 
+                    ? 'bg-kulinarasa-darkblue text-white' 
+                    : 'bg-white text-kulinarasa-darkblue hover:bg-kulinarasa-darkblue hover:text-white'
+                } ${bookmarkLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={isBookmarked ? 'Remove from saved' : 'Save recipe'}
+              >
+                {bookmarkLoading ? (
+                  <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
+                ) : isBookmarked ? (
+                  <BookmarkCheck size={20} />
+                ) : (
+                  <Bookmark size={20} />
+                )}
               </button>
-              <button className="bg-white p-2 rounded-full shadow">
+              <button 
+                onClick={handleShare}
+                className="bg-white p-2 rounded-full shadow hover:bg-gray-50 transition-colors"
+                title="Share recipe"
+              >
                 <Share2 size={20} className="text-kulinarasa-darkblue" />
               </button>
             </div>
@@ -406,6 +521,12 @@ export default function RecipePage() {
                 <div className="text-sm px-2 py-1 rounded bg-kulinarasa-lightblue bg-opacity-20 text-kulinarasa-darkblue">
                   {recipe.is_public ? 'Public Recipe' : 'Private Recipe'}
                 </div>
+                {isBookmarked && (
+                  <div className="flex items-center gap-1 mt-1 text-xs text-kulinarasa-darkblue">
+                    <BookmarkCheck size={12} />
+                    <span>Saved</span>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -479,7 +600,9 @@ export default function RecipePage() {
               {/* Status Messages */}
               {reviewSuccess && (
                 <div className="mb-4 p-3 bg-green-100 text-green-700 rounded flex justify-between items-center">
-                  <span>Action completed successfully!</span>
+                  <span>
+                    {isBookmarked && !reviewError ? 'Recipe saved successfully!' : 'Action completed successfully!'}
+                  </span>
                   <button onClick={() => setReviewSuccess(false)} className="text-green-700">
                     <X size={16} />
                   </button>
@@ -613,7 +736,7 @@ export default function RecipePage() {
                             <button
                               type="button"
                               onClick={handleCancelEdit}
-                              className="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-100"
+                              className="px-4 py-2 rounded border bg-white border-gray-300 text-gray-700 hover:bg-gray-100"
                             >
                               Cancel
                             </button>
@@ -639,7 +762,7 @@ export default function RecipePage() {
                                 <div className="flex gap-2">
                                   <button 
                                     onClick={() => handleStartEdit(review)}
-                                    className="text-blue-600 hover:text-blue-800"
+                                    className="text-white bg-kulinarasa-orange hover:bg-kulinarasa-brown"
                                     title="Edit review"
                                   >
                                     <Pencil size={16} />
@@ -647,7 +770,7 @@ export default function RecipePage() {
                                   
                                   <button 
                                     onClick={() => handleConfirmDelete(review.id)}
-                                    className="text-red-600 hover:text-red-800"
+                                    className="text-white bg-kulinarasa-orange hover:bg-red-800"
                                     title="Delete review"
                                   >
                                     <Trash2 size={16} />
@@ -674,7 +797,7 @@ export default function RecipePage() {
                                 </button>
                                 <button
                                   onClick={handleCancelDelete}
-                                  className="px-3 py-1 rounded border border-gray-300 text-gray-700 hover:bg-gray-100"
+                                  className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
                                 >
                                   Cancel
                                 </button>

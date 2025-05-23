@@ -31,7 +31,7 @@ export default function RegisterPage() {
         password: formData.password
       }).toString()
       
-      const response = await fetch(`https://kulinarasa-backend.vercel.app/register/?${queryParams}`, {
+      const response = await fetch(`https://kulinarasa-backend.vercel.app/user/register/?${queryParams}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

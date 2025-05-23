@@ -8,6 +8,9 @@ import CreateRecipePage from './components/CreateRecipePage'
 import RecipePage from './components/RecipePage';
 import ProfilePage from './components/ProfilePage'
 import SavedPage from './components/SavedPage';
+import SearchResults from './components/SearchResultsPage'
+import EditRecipe from './components/EditRecipePage';
+
 
 function App() {
   return (
@@ -21,6 +24,10 @@ function App() {
         <Route path="/recipe/:id" element={<RecipePage />}/>
         <Route path="/profile/:id" element={<ProfilePage />}/>
         <Route path="/saved" element={<SavedPage />}/>
+        <Route path="/search/:q" element={<SearchResults />} />
+        <Route path="/recipe/edit/:id" element={<EditRecipe />} />
+
+        
       </Routes>
 
     </BrowserRouter>
